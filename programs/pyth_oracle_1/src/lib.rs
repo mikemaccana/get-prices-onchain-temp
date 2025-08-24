@@ -1,7 +1,14 @@
+// Stops Rust Analyzer complaining about missing configs
+// See https://solana.stackexchange.com/questions/17777
+#![allow(unexpected_cfgs)]
+// Fix warning: use of deprecated method `anchor_lang::prelude::AccountInfo::<'a>::realloc`: Use AccountInfo::resize() instead
+// See https://solana.stackexchange.com/questions/22979
+#![allow(deprecated)]
+
 use anchor_lang::prelude::*;
 use pyth_solana_receiver_sdk::price_update::{get_feed_id_from_hex, PriceUpdateV2};
 
-declare_id!("EqSoErknqGk2j26xxdTdyqQzc13frMXoNL9jPJtstFDK");
+declare_id!("5hC6mtKFiK6YBZq2PMdju5rP2qGuuHsXnNS7Neqhtays");
 
 #[derive(Accounts)]
 #[instruction(id:String)]
@@ -23,12 +30,10 @@ pub mod pyth_oracle_1 {
         let feed_id: [u8; 32] = get_feed_id_from_hex(&id)?;
         let price = price_update.get_price_no_older_than(&Clock::get()?, maximum_age, &feed_id)?;
 
-        msg!(
-            "The price is ({} ± {}) * 10^{}",
-            price.price,
-            price.conf,
-            price.exponent
-        );
+        msg!("Price: {}", price.price);
+        msg!("Confidence: {}", price.conf);
+        msg!("Exponent: {}", price.exponent);
+
         Ok(())
     }
 }
